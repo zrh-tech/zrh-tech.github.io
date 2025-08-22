@@ -1,0 +1,21 @@
+{
+  "lastUpdated": "2023-10-25T10:30:00Z",
+  "items": [
+    {
+      "id": 1,
+      "title": "美丽的风景",
+      "description": "这是我旅行时拍摄的一张风景照片",
+      "type": "image",
+      "url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "date": "2023-09-15"
+    },
+    {
+      "id": 2,
+      "title": "城市夜景",
+      "description": "城市夜晚的灯光总是令人着迷",
+      "type": "image",
+      "url": "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df",
+      "date": "2023-10-02"
+    }
+  ]
+}

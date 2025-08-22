@@ -1,0 +1,114 @@
+name: Update Content
+on:
+  push:
+    paths:
+      - 'content/**'  # 当content目录有变更时触发
+      - '!content.json'  # 排除content.json本身，避免循环触发
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Generate content.json
+      run: |
+        # 安装必要的依赖
+        npm install -g yamljs  # 如果需要处理YAML文件
+        
+        # 创建更新内容的脚本
+        cat > update-content.js << 'EOF'
+        const fs = require('fs');
+        const path = require('path');
+        const yaml = require('yamljs'); // 如果需要处理YAML
+
+        // 读取content目录中的文件
+        const contentDir = './content';
+        const outputFile = './content.json';
+        
+        // 确保content目录存在
+        if (!fs.existsSync(contentDir)) {
+          fs.mkdirSync(contentDir, { recursive: true });
+        }
+        
+        // 读取现有的content.json（如果存在）
+        let existingContent = { items: [] };
+        if (fs.existsSync(outputFile)) {
+          try {
+            existingContent = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+          } catch (e) {
+            console.log('无法解析现有的content.json，将创建新文件');
+          }
+        }
+        
+        // 获取content目录中的所有文件
+        const files = fs.readdirSync(contentDir);
+        const contentItems = [];
+        
+        // 处理每个文件
+        files.forEach((file, index) => {
+          const filePath = path.join(contentDir, file);
+          const ext = path.extname(file).toLowerCase();
+          
+          // 根据文件类型处理
+          if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext)) {
+            contentItems.push({
+              id: existingContent.items.length + index + 1,
+              title: path.parse(file).name,
+              description: `这是文件 ${file} 的描述`,
+              type: 'image',
+              url: `https://raw.githubusercontent.com/${{ github.repository }}/main/content/${file}`,
+              date: new Date().toISOString().split('T')[0]
+            });
+          } else if (['.mp4', '.webm', '.mov'].includes(ext)) {
+            contentItems.push({
+              id: existingContent.items.length + index + 1,
+              title: path.parse(file).name,
+              description: `这是文件 ${file} 的描述`,
+              type: 'video',
+              url: `https://raw.githubusercontent.com/${{ github.repository }}/main/content/${file}`,
+              date: new Date().toISOString().split('T')[0]
+            });
+          } else if (['.md', '.txt'].includes(ext)) {
+            // 处理文本文件
+            const content = fs.readFileSync(filePath, 'utf8');
+            contentItems.push({
+              id: existingContent.items.length + index + 1,
+              title: path.parse(file).name,
+              description: content.substring(0, 100) + '...', // 截取前100字符
+              type: 'text',
+              content: content,
+              date: new Date().toISOString().split('T')[0]
+            });
+          }
+        });
+        
+        // 合并现有内容和新增内容
+        const updatedContent = {
+          lastUpdated: new Date().toISOString(),
+          items: [...existingContent.items, ...contentItems]
+        };
+        
+        // 写入content.json
+        fs.writeFileSync(outputFile, JSON.stringify(updatedContent, null, 2));
+        console.log('content.json已更新');
+        EOF
+        
+        # 运行更新脚本
+        node update-content.js
+
+    - name: Commit and push changes
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add content.json
+        git diff --staged --quiet || git commit -m "自动更新内容 [skip ci]"
+        git push
