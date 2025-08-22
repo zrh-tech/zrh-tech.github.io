@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冰瓜不嘻嘻 | 个人主页</title>
+    <title>冰瓜不嘻嘻 | 个人朋友圈</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -21,7 +21,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 20px;
         }
         
@@ -32,6 +31,7 @@
             border-radius: 24px;
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
             overflow: hidden;
+            margin-bottom: 30px;
         }
         
         header {
@@ -39,6 +39,22 @@
             padding: 50px 40px 30px;
             background: linear-gradient(135deg, #2c92e5, #2575cf);
             color: white;
+            position: relative;
+        }
+        
+        .admin-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: none;
+        }
+        
+        .admin-indicator.active {
+            display: block;
         }
         
         h1 {
@@ -116,6 +132,365 @@
             margin-top: 20px;
         }
         
+        .media-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #2c92e5, #2575cf);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(44, 146, 229, 0.3);
+        }
+        
+        .media-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(44, 146, 229, 0.4);
+        }
+        
+        .media-btn.admin-only {
+            display: none;
+        }
+        
+        .media-btn.admin-only.active {
+            display: block;
+        }
+        
+        /* 朋友圈样式 */
+        .moment {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+        
+        .moment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2c92e5, #2575cf);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .moment-info {
+            flex: 1;
+        }
+        
+        .author {
+            font-weight: 600;
+            color: #2c92e5;
+        }
+        
+        .timestamp {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .moment-content {
+            margin-bottom: 15px;
+        }
+        
+        .moment-text {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .moment-media {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .media-item {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f7fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .moment-actions {
+            display: flex;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 15px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            color: #666;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        
+        .action-btn i {
+            margin-right: 5px;
+        }
+        
+        .action-btn:hover {
+            color: #2c92e5;
+        }
+        
+        .action-btn.admin-only {
+            display: none;
+        }
+        
+        .action-btn.admin-only.active {
+            display: flex;
+        }
+        
+        /* 登录模态框 */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .login-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .login-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .login-header {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .login-header h3 {
+            color: #2c92e5;
+            font-size: 1.5rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #ff3b30;
+        }
+        
+        .login-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #2c92e5;
+        }
+        
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2c92e5, #2575cf);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(44, 146, 229, 0.4);
+        }
+        
+        .error-message {
+            color: #ff3b30;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        /* 添加朋友圈的模态框 */
+        .add-moment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .add-moment-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .add-moment-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .add-moment-header {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .add-moment-header h3 {
+            color: #2c92e5;
+            font-size: 1.5rem;
+        }
+        
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            text-align: center;
+        }
+        
+        .file-upload:hover {
+            border-color: #2c92e5;
+        }
+        
+        .file-upload i {
+            font-size: 2.5rem;
+            color: #2c92e5;
+            margin-bottom: 10px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .preview-item {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-preview {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ff3b30;
+            font-size: 14px;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 width: 95%;
@@ -132,12 +507,19 @@
             .content {
                 padding: 30px 20px;
             }
+            
+            .moment-media {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
+            <div class="admin-indicator" id="adminIndicator">
+                <i class="fas fa-lock"></i> 管理员模式
+            </div>
             <h1>这里是冰瓜不嘻嘻</h1>
             <p class="intro">我叫冰瓜不嘻嘻，我今天跟着某个up主开一个奇怪的网站，里面会放一些我的东西。</p>
         </header>
@@ -147,6 +529,18 @@
                 <h2><i class="fas fa-user"></i> 关于我</h2>
                 <p>我就是冰瓜不嘻嘻，探索、创造和分享是我生活的一部分。这个网站将记录我的旅程和创作。</p>
                 <p>在这里，我会分享我的想法、项目和有趣的内容。</p>
+            </div>
+            
+            <button class="media-btn admin-only" id="addMomentBtn">
+                <i class="fas fa-plus-circle"></i> 发布新内容
+            </button>
+            
+            <button class="media-btn" id="loginBtn">
+                <i class="fas fa-lock"></i> 管理员登录
+            </button>
+            
+            <div id="momentsContainer">
+                <!-- 朋友圈内容将在这里动态生成 -->
             </div>
             
             <div class="counter">
@@ -161,9 +555,96 @@
         </div>
     </div>
 
+    <!-- 登录模态框 -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <div class="login-header">
+                <h3>管理员登录</h3>
+                <button class="close-btn" id="closeLoginModal">&times;</button>
+            </div>
+            <div class="login-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" class="form-control" id="password" placeholder="请输入管理员密码">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">登录</button>
+                    <div class="error-message" id="loginError">密码错误，请重试</div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加朋友圈的模态框 -->
+    <div class="add-moment-modal" id="addMomentModal">
+        <div class="add-moment-content">
+            <div class="add-moment-header">
+                <h3>发布新内容</h3>
+                <button class="close-btn" id="closeAddModal">&times;</button>
+            </div>
+            <div class="add-moment-body">
+                <form id="momentForm">
+                    <div class="form-group">
+                        <label for="momentText">分享你想说的话</label>
+                        <textarea class="form-control" id="momentText" placeholder="今天有什么新鲜事？"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>添加图片或视频</label>
+                        <div class="file-upload" id="fileUpload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>点击或拖放文件到这里</p>
+                            <p class="small">支持jpg, png, mp4格式</p>
+                            <input type="file" class="file-input" id="mediaInput" accept="image/*,video/*" multiple>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-container" id="previewContainer">
+                        <!-- 预览内容将在这里显示 -->
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">发布</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 简单的数字递增动画
-        document.addEventListener('DOMContentLoaded', function() {
+        // 初始化朋友圈数据
+        let moments = JSON.parse(localStorage.getItem('moments')) || [];
+        
+        // 管理员密码（您可以修改这个密码）
+        const ADMIN_PASSWORD = "binggua123";
+        
+        // 检查是否已登录
+        let isAdmin = localStorage.getItem('isAdmin') === 'true';
+        
+        // DOM元素
+        const adminIndicator = document.getElementById('adminIndicator');
+        const addMomentBtn = document.getElementById('addMomentBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const addMomentModal = document.getElementById('addMomentModal');
+        const closeAddModal = document.getElementById('closeAddModal');
+        const momentsContainer = document.getElementById('momentsContainer');
+        const momentForm = document.getElementById('momentForm');
+        const fileUpload = document.getElementById('fileUpload');
+        const mediaInput = document.getElementById('mediaInput');
+        const previewContainer = document.getElementById('previewContainer');
+        
+        // 文件数据存储
+        let fileData = [];
+        
+        // 初始化页面
+        function initPage() {
+            // 更新管理员状态
+            updateAdminStatus();
+            
+            // 数字递增动画
             const counter = document.querySelector('.counter-number');
             let count = 0;
             const target = 999;
@@ -180,7 +661,307 @@
                 }
                 counter.textContent = Math.round(count) + '+';
             }, interval);
-        });
+            
+            // 渲染朋友圈
+            renderMoments();
+            
+            // 绑定事件
+            bindEvents();
+        }
+        
+        // 绑定事件
+        function bindEvents() {
+            // 打开登录模态框
+            loginBtn.addEventListener('click', () => {
+                loginModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // 关闭登录模态框
+            closeLoginModal.addEventListener('click', () => {
+                loginModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                loginForm.reset();
+                loginError.style.display = 'none';
+            });
+            
+            // 点击登录模态框背景关闭
+            loginModal.addEventListener('click', (e) => {
+                if (e.target === loginModal) {
+                    loginModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    loginForm.reset();
+                    loginError.style.display = 'none';
+                }
+            });
+            
+            // 登录表单提交
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('password').value;
+                
+                if (password === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    localStorage.setItem('isAdmin', 'true');
+                    updateAdminStatus();
+                    loginModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    loginForm.reset();
+                } else {
+                    loginError.style.display = 'block';
+                }
+            });
+            
+            // 打开添加内容模态框
+            addMomentBtn.addEventListener('click', () => {
+                if (isAdmin) {
+                    addMomentModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            });
+            
+            // 关闭添加内容模态框
+            closeAddModal.addEventListener('click', () => {
+                addMomentModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                resetForm();
+            });
+            
+            // 点击添加内容模态框背景关闭
+            addMomentModal.addEventListener('click', (e) => {
+                if (e.target === addMomentModal) {
+                    addMomentModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    resetForm();
+                }
+            });
+            
+            // 文件上传区域点击事件
+            fileUpload.addEventListener('click', () => {
+                mediaInput.click();
+            });
+            
+            // 文件选择事件
+            mediaInput.addEventListener('change', handleFileSelect);
+            
+            // 拖放文件事件
+            fileUpload.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUpload.style.borderColor = '#2c92e5';
+                fileUpload.style.backgroundColor = '#f8f9fa';
+            });
+            
+            fileUpload.addEventListener('dragleave', () => {
+                fileUpload.style.borderColor = '#ddd';
+                fileUpload.style.backgroundColor = 'transparent';
+            });
+            
+            fileUpload.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUpload.style.borderColor = '#ddd';
+                fileUpload.style.backgroundColor = 'transparent';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    mediaInput.files = e.dataTransfer.files;
+                    handleFileSelect({ target: mediaInput });
+                }
+            });
+            
+            // 表单提交事件
+            momentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const text = document.getElementById('momentText').value.trim();
+                
+                if (fileData.length === 0 && !text) {
+                    alert('请添加文字或媒体内容');
+                    return;
+                }
+                
+                // 创建新的朋友圈
+                const newMoment = {
+                    id: Date.now(),
+                    text: text,
+                    media: fileData,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // 添加到数据数组
+                moments.unshift(newMoment);
+                
+                // 保存到本地存储
+                localStorage.setItem('moments', JSON.stringify(moments));
+                
+                // 重新渲染朋友圈
+                renderMoments();
+                
+                // 关闭模态框并重置表单
+                addMomentModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                resetForm();
+                
+                alert('内容发布成功！');
+            });
+        }
+        
+        // 更新管理员状态
+        function updateAdminStatus() {
+            if (isAdmin) {
+                adminIndicator.classList.add('active');
+                addMomentBtn.classList.add('active');
+                document.querySelectorAll('.action-btn.admin-only').forEach(btn => {
+                    btn.classList.add('active');
+                });
+                loginBtn.style.display = 'none';
+            } else {
+                adminIndicator.classList.remove('active');
+                addMomentBtn.classList.remove('active');
+                document.querySelectorAll('.action-btn.admin-only').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                loginBtn.style.display = 'block';
+            }
+        }
+        
+        // 处理文件选择
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            
+            // 清空预览容器和文件数据
+            previewContainer.innerHTML = '';
+            fileData = [];
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    
+                    if (file.type.startsWith('image/')) {
+                        previewItem.innerHTML = `
+                            <img src="${event.target.result}" alt="预览">
+                            <div class="remove-preview" onclick="removePreview(this, ${i})">×</div>
+                        `;
+                        
+                        fileData.push({
+                            type: 'image',
+                            src: event.target.result
+                        });
+                    } else if (file.type.startsWith('video/')) {
+                        previewItem.innerHTML = `
+                            <video controls>
+                                <source src="${event.target.result}" type="${file.type}">
+                            </video>
+                            <div class="remove-preview" onclick="removePreview(this, ${i})">×</div>
+                        `;
+                        
+                        fileData.push({
+                            type: 'video',
+                            src: event.target.result
+                        });
+                    }
+                    
+                    previewContainer.appendChild(previewItem);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // 移除预览
+        function removePreview(element, index) {
+            element.parentElement.remove();
+            fileData.splice(index, 1);
+        }
+        
+        // 重置表单
+        function resetForm() {
+            momentForm.reset();
+            previewContainer.innerHTML = '';
+            fileData = [];
+        }
+        
+        // 渲染朋友圈
+        function renderMoments() {
+            if (moments.length === 0) {
+                momentsContainer.innerHTML = `
+                    <div class="no-moments" style="text-align: center; padding: 40px; color: #888;">
+                        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>暂无内容</h3>
+                        <p>期待作者的分享</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            momentsContainer.innerHTML = '';
+            moments.forEach(moment => {
+                const momentElement = document.createElement('div');
+                momentElement.className = 'moment';
+                
+                const date = new Date(moment.timestamp);
+                const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                
+                let mediaHTML = '';
+                if (moment.media && moment.media.length > 0) {
+                    mediaHTML = '<div class="moment-media">';
+                    moment.media.forEach(media => {
+                        if (media.type === 'image') {
+                            mediaHTML += `<div class="media-item"><img src="${media.src}" alt="朋友圈图片"></div>`;
+                        } else if (media.type === 'video') {
+                            mediaHTML += `
+                                <div class="media-item">
+                                    <video controls>
+                                        <source src="${media.src}" type="video/mp4">
+                                    </video>
+                                </div>
+                            `;
+                        }
+                    });
+                    mediaHTML += '</div>';
+                }
+                
+                momentElement.innerHTML = `
+                    <div class="moment-header">
+                        <div class="avatar">冰</div>
+                        <div class="moment-info">
+                            <div class="author">冰瓜不嘻嘻</div>
+                            <div class="timestamp">${formattedDate}</div>
+                        </div>
+                    </div>
+                    <div class="moment-content">
+                        ${moment.text ? `<p class="moment-text">${moment.text}</p>` : ''}
+                        ${mediaHTML}
+                    </div>
+                    <div class="moment-actions">
+                        <button class="action-btn"><i class="far fa-heart"></i> 点赞</button>
+                        <button class="action-btn"><i class="far fa-comment"></i> 评论</button>
+                        <button class="action-btn admin-only" onclick="deleteMoment(${moment.id})"><i class="far fa-trash-alt"></i> 删除</button>
+                    </div>
+                `;
+                
+                momentsContainer.appendChild(momentElement);
+            });
+            
+            // 更新管理员状态
+            updateAdminStatus();
+        }
+        
+        // 删除朋友圈
+        function deleteMoment(id) {
+            if (confirm('确定要删除这条内容吗？')) {
+                moments = moments.filter(moment => moment.id !== id);
+                localStorage.setItem('moments', JSON.stringify(moments));
+                renderMoments();
+            }
+        }
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', initPage);
     </script>
 </body>
 </html>
